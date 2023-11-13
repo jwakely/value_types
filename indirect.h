@@ -28,24 +28,13 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 #include <utility>
 
+#include "unreachable.h"
+
 #if __has_include(<format>)
 #include <format>
 #endif
 
 namespace xyz {
-
-#ifndef XYZ_UNREACHABLE_DEFINED
-#define XYZ_UNREACHABLE_DEFINED
-[[noreturn]] inline void unreachable() {  // LCOV_EXCL_LINE
-#if (__cpp_lib_unreachable >= 202202L)
-  std::unreachable();  // LCOV_EXCL_LINE
-#elif defined(_MSC_VER)
-  __assume(false);  // LCOV_EXCL_LINE
-#else
-  __builtin_unreachable();  // LCOV_EXCL_LINE
-#endif
-}
-#endif  // XYZ_UNREACHABLE_DEFINED
 
 template <class T, class A>
 class indirect;
@@ -221,7 +210,7 @@ class indirect {
       if (alloc_ == other.alloc_) {
         std::swap(p_, other.p_);
       } else {
-        unreachable();  // LCOV_EXCL_LINE
+        xyz::unreachable();  // LCOV_EXCL_LINE
       }
     }
   }

@@ -1,8 +1,26 @@
 cc_library(
+    name = "unreachable",
+    hdrs = ["unreachable.h"],
+    copts = ["-Iexternal/value_types/"],
+    visibility = ["//visibility:public"],
+)
+
+cc_test(
+    name = "unreachable_test",
+    size = "small",
+    srcs = ["unreachable_test.cc"],
+    deps = [
+        "unreachable",
+        "@com_google_googletest//:gtest_main",
+    ],
+)
+
+cc_library(
     name = "indirect",
     hdrs = ["indirect.h"],
     copts = ["-Iexternal/value_types/"],
     visibility = ["//visibility:public"],
+    deps = ["unreachable"],
 )
 
 cc_test(
@@ -18,6 +36,7 @@ cc_test(
 cc_library(
     name = "polymorphic",
     hdrs = ["polymorphic.h"],
+    deps = ["unreachable"],
     copts = ["-Iexternal/value_types/"],
     visibility = ["//visibility:public"],
 )

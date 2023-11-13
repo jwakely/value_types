@@ -33,8 +33,18 @@ vt_add_library(
 )
 target_sources(value_types
     INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/unreachable.h>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/indirect.h>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/polymorphic.h>
+)
+
+vt_add_library(
+    NAME unreachable
+    ALIAS value_types::unreachable
+)
+target_sources(unreachable
+    INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/unreachable.h>
 )
 
 vt_add_library(
@@ -43,6 +53,7 @@ vt_add_library(
 )
 target_sources(indirect
     INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/unreachable.h>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/indirect.h>
 )
 
@@ -52,6 +63,7 @@ vt_add_library(
 )
 target_sources(polymorphic
     INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/unreachable.h>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/polymorphic.h>
 )
 
@@ -62,6 +74,7 @@ vt_add_library(
 )
 target_sources(polymorphic_inline_vtable
     INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/unreachable.h>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/polymorphic.h>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/experimental/polymorphic_inline_vtable.h>
 )
@@ -73,6 +86,7 @@ vt_add_library(
 )
 target_sources(polymorphic_sbo
     INTERFACE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/unreachable.h>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/polymorphic.h>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/experimental/polymorphic_sbo.h>
 )
@@ -120,6 +134,12 @@ if (${CPP_VALUE_TYPES_IS_NOT_SUBPROJECT})
             find_package(codecov)
             list(APPEND LCOV_REMOVE_PATTERNS "'/usr/*'")
         endif()
+
+        vt_add_test(
+            NAME unreachable_test
+            LINK_LIBRARIES unreachable
+            FILES unreachable_test.cc
+        )
 
         vt_add_test(
             NAME indirect_test

@@ -34,20 +34,9 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <memory>
 #include <utility>
 
-namespace xyz {
+#include "unreachable.h"
 
-#ifndef XYZ_UNREACHABLE_DEFINED
-#define XYZ_UNREACHABLE_DEFINED
-[[noreturn]] inline void unreachable() {  // LCOV_EXCL_LINE
-#if (__cpp_lib_unreachable >= 202202L)
-  std::unreachable();  // LCOV_EXCL_LINE
-#elif defined(_MSC_VER)
-  __assume(false);  // LCOV_EXCL_LINE
-#else
-  __builtin_unreachable();  // LCOV_EXCL_LINE
-#endif
-}
-#endif  // XYZ_UNREACHABLE_DEFINED
+namespace xyz {
 
 struct NoPolymorphicSBO {};
 
@@ -281,7 +270,7 @@ class polymorphic {
       if (alloc_ == other.alloc_) {
         std::swap(cb_, other.cb_);
       } else {
-        unreachable();  // LCOV_EXCL_LINE
+        xyz::unreachable();  // LCOV_EXCL_LINE
       }
     }
   }
