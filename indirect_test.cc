@@ -28,6 +28,7 @@ CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <memory_resource>
 #endif  // #if __has_include(<memory_resource>)
 #include <optional>
+#include <scoped_allocator>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -783,4 +784,40 @@ TEST(IndirectTest, TaggedAllocatorEqualAllocatorMoveAssign) {
 
   red = std::move(red);  // -Wno-self-move
 }
+
+template <typename T>
+struct TestAllocator {
+  using value_type = T;
+
+  template <typename Other>
+  struct rebind {
+    using other = TestAllocator<Other>;
+  };
+
+  constexpr T* allocate(std::size_t n) {
+    std::allocator<T> default_allocator{};
+    return default_allocator.allocate(n);
+  }
+
+  constexpr void deallocate(T* p, std::size_t n) {
+    std::allocator<T> default_allocator{};
+    default_allocator.deallocate(p, n);
+  }
+
+  friend bool operator==(const TestAllocator& lhs,
+                         const TestAllocator& rhs) noexcept = default;
+};
+
+template <>
+struct TestAllocator<std::string> {};
+
+template <typename T>
+using ScopedTestAllocator = std::scoped_allocator_adaptor<TestAllocator<T>>;
+
+TEST(IndirectTest, AllocatorAwareType) {
+  xyz::indirect<std::vector<std::string>,
+                ScopedTestAllocator<std::vector<std::string>>>
+      s;
+}
+
 }  // namespace

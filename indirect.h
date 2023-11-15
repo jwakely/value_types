@@ -326,13 +326,26 @@ class indirect {
 
   template <typename... Ts>
   constexpr static T* construct_from(A alloc, Ts&&... ts) {
-    T* mem = allocator_traits::allocate(alloc, 1);
-    try {
-      allocator_traits::construct(alloc, mem, std::forward<Ts>(ts)...);
-      return mem;
-    } catch (...) {
-      allocator_traits::deallocate(alloc, mem, 1);
-      throw;
+    if constexpr (!std::uses_allocator<T, A>::value) {
+      T* mem = allocator_traits::allocate(alloc, 1);
+      try {
+        allocator_traits::construct(alloc, mem, std::forward<Ts>(ts)...);
+        return mem;
+      } catch (...) {
+        allocator_traits::deallocate(alloc, mem, 1);
+        throw;
+      }
+    } else /* constexpr */ {
+      static_assert(false, "Allocator-aware construction is unsupported");
+      T* mem = allocator_traits::allocate(alloc, 1);
+      try {
+        allocator_traits::construct(alloc, mem, std::allocator_arg, alloc,
+                                    std::forward<Ts>(ts)...);
+        return mem;
+      } catch (...) {
+        allocator_traits::deallocate(alloc, mem, 1);
+        throw;
+      }
     }
   }
 
